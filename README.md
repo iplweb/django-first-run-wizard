@@ -240,13 +240,32 @@ translation. The bundled `example/` project is wired this way.
 
 ### Adding a new language
 
+The library and the bundled `example/` project keep **separate** message
+catalogs. `makemessages` scans the filesystem from your current
+directory, so each catalog is extracted from its own subtree:
+
 ```bash
-# from the package root:
+# Library strings — run from inside the package:
 cd src/first_run_wizard
-django-admin makemessages -l <lang>     # e.g. de, fr, es, cs
+django-admin makemessages -l <lang>      # e.g. de, fr, es, cs
 # edit locale/<lang>/LC_MESSAGES/django.po
 django-admin compilemessages
 ```
+
+```bash
+# Example-project strings — run from inside example/:
+cd example
+python manage.py makemessages -l <lang>
+# edit locale/<lang>/LC_MESSAGES/django.po
+python manage.py compilemessages
+```
+
+Do **not** run `makemessages` from the repository root — it would
+walk the entire tree, mix library and example strings into whichever
+`locale/` it writes to, and silently break the separation. CI has a
+`translations` job that re-extracts both catalogs from sources and
+fails the build if they drifted, so contamination is caught before
+merge.
 
 Requires the `gettext` toolchain (`brew install gettext` on macOS,
 `apt install gettext` on Debian/Ubuntu). PRs adding more translations

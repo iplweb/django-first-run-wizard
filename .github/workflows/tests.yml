@@ -97,3 +97,40 @@ jobs:
         run: |
           uv run python manage.py check
           uv run python manage.py migrate --run-syncdb --no-input
+
+  translations:
+    # Re-extracts the library and example .po catalogs from source and
+    # fails if either drifted (new strings unwrapped, removed strings still
+    # in catalog, or — most importantly — strings from the wrong tree
+    # leaking into the other catalog).
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@d4b2f3b6ecc6e67c4457f6d3e41ec42d3d0fcb86  # v5
+
+      - name: Set up Python
+        run: uv python install 3.13
+
+      - name: Install dependencies
+        run: uv sync --all-extras
+
+      - name: Re-extract library catalog
+        working-directory: src/first_run_wizard
+        run: uv run django-admin makemessages -l pl --no-location
+
+      - name: Re-extract example catalog
+        working-directory: example
+        run: uv run python manage.py makemessages -l pl --no-location
+
+      - name: Fail if any catalog drifted
+        # POT-Creation-Date is bumped on every makemessages run; the -I
+        # flag tells git diff to ignore hunks whose every changed line
+        # matches that regex, so date-only churn does not trigger a fail.
+        run: |
+          if ! git diff -I 'POT-Creation-Date' --exit-code -- '**/locale/**/*.po'; then
+            echo "::error::Translation catalogs drifted from source strings."
+            echo "::error::Run the makemessages commands shown above locally and commit the .po updates."
+            exit 1
+          fi
