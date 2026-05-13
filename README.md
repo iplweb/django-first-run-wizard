@@ -169,11 +169,36 @@ registry.register(MyCustomAdminStep())
 
 | Setting | Default | Purpose |
 |---|---|---|
-| `FIRST_RUN_WIZARD_SKIP_PREFIXES` | `()` | Extra URL prefixes the middleware will not redirect (e.g. `("/metrics/", "/healthz/")`). Defaults `/static/`, `/media/`, `/__debug__/` are always included. |
+| `FIRST_RUN_WIZARD_SKIP_PREFIXES` | `()` | Extra URL prefixes the middleware will not redirect (e.g. `("/metrics/", "/healthz/")`). Always-on built-in defaults: `/static/`, `/media/`, `/__debug__/`, `/admin/`. |
 | `FIRST_RUN_WIZARD_SKIP_SUBSTRINGS` | `()` | Extra substrings (e.g. `("login", "logout")`). Default `migrate` is always included. |
 
 The wizard's own URLs (`first_run_wizard:status` and below) are
 auto-skipped to avoid redirect loops.
+
+### Whitelist of always-accessible URLs
+
+The middleware's defaults are deliberately permissive: `/static/`,
+`/media/`, `/__debug__/`, and **`/admin/`** are skipped unconditionally,
+which means a logged-in superuser can always reach Django admin — even
+while project-specific wizard steps are still pending. Without this,
+once `admin_user` was done but, say, `create_tenant` was not, the
+superuser would be bounced back to the wizard on every `/admin/*` hit,
+making admin effectively unreachable mid-setup.
+
+`FIRST_RUN_WIZARD_SKIP_PREFIXES` extends (not replaces) the built-in
+defaults. If your project mounts admin under a non-default URL, add
+that prefix:
+
+```python
+# settings.py
+FIRST_RUN_WIZARD_SKIP_PREFIXES = ("/management/",)  # custom admin path
+```
+
+Matching is `path.startswith(prefix)`, so the prefix should include
+trailing `/`. Anonymous visitors hitting `/admin/login/` on a fresh
+install with no users yet land on Django's default login screen — which
+won't accept any credentials, since there are no users — so they
+typically discover the wizard via the redirect from `/` instead.
 
 ## Supported versions
 

@@ -104,3 +104,37 @@ def test_no_redirect_when_all_steps_complete():
     response = Client().get("/")
     assert response.status_code == 200
     assert response.content == b"home"
+
+
+@pytest.mark.django_db
+def test_admin_prefix_is_skipped_by_default():
+    """An always-incomplete superuser-only step must not block /admin/.
+
+    Regression: before /admin/ was a default skip prefix, a logged-in
+    superuser visiting /admin/ while a project-specific step was pending
+    got bounced to that step, making admin unreachable mid-setup.
+    """
+    registry.register(_AlwaysIncompleteSuperuserStep())
+    try:
+        admin = User.objects.create_superuser(
+            username="admin",
+            email="a@b.c",
+            password="VeryStrong123!",  # noqa: S106
+        )
+        client = Client()
+        client.force_login(admin)
+
+        # /admin/ — even a 404 from Django routing here is the desired
+        # outcome; what matters is that the middleware did NOT redirect.
+        response = client.get("/admin/")
+        if response.status_code == 302:
+            assert "/setup/" not in response.url, (
+                "Middleware unexpectedly redirected /admin/ into the wizard"
+            )
+
+        # And a deeper admin URL too — same prefix rule applies.
+        response = client.get("/admin/auth/user/")
+        if response.status_code == 302:
+            assert "/setup/" not in response.url
+    finally:
+        registry.unregister("fake_tenant")

@@ -12,6 +12,7 @@ DEFAULT_SKIP_PREFIXES: tuple[str, ...] = (
     "/static/",
     "/media/",
     "/__debug__/",
+    "/admin/",
 )
 
 DEFAULT_SKIP_SUBSTRINGS: tuple[str, ...] = ("migrate",)
@@ -20,13 +21,19 @@ DEFAULT_SKIP_SUBSTRINGS: tuple[str, ...] = ("migrate",)
 class FirstRunWizardMiddleware:
     """Redirect every request to the next incomplete wizard step.
 
-    Skips configurable prefixes/substrings (static files, admin login flow,
-    the wizard URLs themselves) so the wizard is reachable.
+    Skips configurable prefixes/substrings (static files, the admin site,
+    the wizard URLs themselves) so the wizard is reachable and so the
+    superuser can still get into Django admin while project-specific
+    steps are pending.
 
     Configure in `settings.py`:
 
         FIRST_RUN_WIZARD_SKIP_PREFIXES = ("/metrics/", "/healthz/")
         FIRST_RUN_WIZARD_SKIP_SUBSTRINGS = ("login", "logout")
+
+    These are *additive* — they extend the always-on defaults above
+    (`/static/`, `/media/`, `/__debug__/`, `/admin/`). If your project
+    mounts admin under a non-default URL, add that prefix here.
 
     Install *after* `AuthenticationMiddleware` so `request.user` is set
     when steps check `is_accessible()`.
