@@ -56,6 +56,14 @@ STATIC_URL = "/static/"
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 USE_TZ = True
 
+_PW = "django.contrib.auth.password_validation"
+AUTH_PASSWORD_VALIDATORS = [
+    {"NAME": f"{_PW}.UserAttributeSimilarityValidator"},
+    {"NAME": f"{_PW}.MinimumLengthValidator"},
+    {"NAME": f"{_PW}.CommonPasswordValidator"},
+    {"NAME": f"{_PW}.NumericPasswordValidator"},
+]
+
 LANGUAGE_CODE = "en"
 LANGUAGES = [
     ("en", "English"),

@@ -66,6 +66,56 @@ def test_admin_step_creates_superuser_and_logs_in():
 
 
 @pytest.mark.django_db
+def test_admin_step_rejects_password_too_short():
+    """Validators from settings must apply (same as admin / createsuperuser)."""
+    client = Client()
+    url = reverse("first_run_wizard:step", kwargs={"name": "admin_user"})
+    response = client.post(
+        url,
+        {
+            "username": "rootadmin",
+            "email": "root@example.com",
+            "password1": "short1",
+            "password2": "short1",
+        },
+    )
+    assert response.status_code == 200, (
+        "form should re-render with errors, not redirect"
+    )
+    assert User.objects.count() == 0
+    form = response.context["form"]
+    assert form.errors, "form should have errors"
+    assert "password1" in form.errors
+    joined = " ".join(form.errors["password1"]).lower()
+    assert "too short" in joined or "8 char" in joined
+
+
+@pytest.mark.django_db
+def test_admin_step_rejects_password_equal_to_username():
+    """UserAttributeSimilarityValidator must reject password == username."""
+    client = Client()
+    url = reverse("first_run_wizard:step", kwargs={"name": "admin_user"})
+    response = client.post(
+        url,
+        {
+            "username": "rootadmin",
+            "email": "root@example.com",
+            "password1": "rootadmin",
+            "password2": "rootadmin",
+        },
+    )
+    assert response.status_code == 200, (
+        "form should re-render with errors, not redirect"
+    )
+    assert User.objects.count() == 0
+    form = response.context["form"]
+    assert form.errors, "form should have errors"
+    assert "password1" in form.errors
+    joined = " ".join(form.errors["password1"]).lower()
+    assert "similar" in joined or "username" in joined
+
+
+@pytest.mark.django_db
 def test_admin_step_rejects_when_user_already_exists():
     User.objects.create_user(username="existing", password="x")  # noqa: S106
     client = Client()

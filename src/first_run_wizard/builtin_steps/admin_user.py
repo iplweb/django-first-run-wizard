@@ -60,8 +60,19 @@ class AdminUserCreationForm(forms.Form):
                 ),
             )
         if p1:
+            # Build an UNSAVED user instance so UserAttributeSimilarityValidator
+            # can compare the password against username/email/first/last name
+            # — same contract as django.contrib.auth.forms.UserCreationForm and
+            # the createsuperuser management command.
+            User = get_user_model()
+            user_attrs = {}
+            for field in ("username", "email", "first_name", "last_name"):
+                value = cleaned.get(field)
+                if value and hasattr(User, field):
+                    user_attrs[field] = value
+            unsaved_user = User(**user_attrs) if user_attrs else None
             try:
-                password_validation.validate_password(p1)
+                password_validation.validate_password(p1, unsaved_user)
             except ValidationError as e:
                 self.add_error("password1", e)
         return cleaned

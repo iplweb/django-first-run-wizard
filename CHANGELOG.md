@@ -7,6 +7,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.1] - 2026-05-13
+
+### Fixed
+- `AdminUserCreationForm` now passes an unsaved `User(username=…, email=…)`
+  instance to `password_validation.validate_password()` so
+  `UserAttributeSimilarityValidator` actually fires — previously a password
+  identical to the username silently passed. This matches the contract used
+  by `django.contrib.auth.forms.UserCreationForm`, the Django admin, and the
+  `createsuperuser` management command.
+
+### Changed
+- Example project (`example/example_project/settings.py`) now ships the
+  Django default `AUTH_PASSWORD_VALIDATORS` (UserAttributeSimilarity,
+  MinimumLength, CommonPassword, NumericPassword) so the wizard's first-
+  superuser step enforces the same rules out of the box.
+
+### Infrastructure
+- Test settings (`tests/settings.py`) gained the same default
+  `AUTH_PASSWORD_VALIDATORS` block, and the suite now exercises
+  too-short-password and password-equals-username rejection paths.
+
 ## [0.1.0] - 2026-05-13
 
 ### Added
@@ -63,5 +84,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   contamination between library and example.
 - Third-party GitHub Action `astral-sh/setup-uv` pinned to commit SHA.
 
-[Unreleased]: https://github.com/iplweb/django-first-run-wizard/compare/v0.1.0...HEAD
+[Unreleased]: https://github.com/iplweb/django-first-run-wizard/compare/v0.1.1...HEAD
+[0.1.1]: https://github.com/iplweb/django-first-run-wizard/compare/v0.1.0...v0.1.1
 [0.1.0]: https://github.com/iplweb/django-first-run-wizard/releases/tag/v0.1.0
