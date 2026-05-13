@@ -1,0 +1,77 @@
+# Polish translation for django-first-run-wizard.
+# Copyright (C) 2026 Michał Pasternak
+# This file is distributed under the same license as the
+# django-first-run-wizard package.
+# Michał Pasternak <michal.dtz@gmail.com>, 2026.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: django-first-run-wizard 0.1.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-05-13 13:56-0500\n"
+"PO-Revision-Date: 2026-05-13 21:00+0200\n"
+"Last-Translator: Michał Pasternak <michal.dtz@gmail.com>\n"
+"Language-Team: Polish <michal.dtz@gmail.com>\n"
+"Language: pl\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=4; plural=(n==1 ? 0 : (n%10>=2 && n%10<=4) && "
+"(n%100<12 || n%100>14) ? 1 : n!=1 && (n%10>=0 && n%10<=1) || (n%10>=5 && "
+"n%10<=9) || (n%100>=12 && n%100<=14) ? 2 : 3);\n"
+
+msgid "Username"
+msgstr "Nazwa użytkownika"
+
+msgid "Required. 150 characters or fewer. Letters, digits and @/./+/-/_ only."
+msgstr "Wymagane. Maksymalnie 150 znaków. Tylko litery, cyfry oraz @/./+/-/_."
+
+msgid "Email address"
+msgstr "Adres e-mail"
+
+msgid "Required. Used for password reset and admin notices."
+msgstr "Wymagane. Używany do resetowania hasła i powiadomień administracyjnych."
+
+msgid "Password"
+msgstr "Hasło"
+
+msgid "Password confirmation"
+msgstr "Potwierdzenie hasła"
+
+msgid "Enter the same password as before, for verification."
+msgstr "Wprowadź to samo hasło ponownie w celu weryfikacji."
+
+msgid "The setup wizard can only run on an empty user table."
+msgstr "Kreator konfiguracji może działać wyłącznie na pustej tabeli użytkowników."
+
+msgid "The two password fields didn't match."
+msgstr "Hasła w obu polach nie są identyczne."
+
+msgid "Create the administrator account"
+msgstr "Utwórz konto administratora"
+
+msgid "Initial system setup"
+msgstr "Wstępna konfiguracja systemu"
+
+msgid "No users exist yet. Create the first administrator account to continue."
+msgstr ""
+"Nie istnieje jeszcze żaden użytkownik. Aby kontynuować, utwórz pierwsze "
+"konto administratora."
+
+msgid "Create administrator"
+msgstr "Utwórz administratora"
+
+msgid "First-Run Wizard"
+msgstr "Kreator pierwszego uruchomienia"
+
+msgid "Setup status"
+msgstr "Stan konfiguracji"
+
+msgid "All setup steps have been completed."
+msgstr "Wszystkie kroki konfiguracji zostały ukończone."
+
+msgid "The following setup steps still need attention:"
+msgstr "Następujące kroki konfiguracji wymagają uwagi:"
+
+msgid "open"
+msgstr "otwórz"

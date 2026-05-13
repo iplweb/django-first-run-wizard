@@ -186,6 +186,47 @@ auto-skipped to avoid redirect loops.
 
 Every ✓ above is covered by the CI matrix in `.github/workflows/tests.yml`.
 
+## Translations
+
+The package ships with English source strings and a Polish translation
+(`pl`). All user-facing strings — form labels, validation errors, step
+`verbose_name`s, and template content — go through Django's i18n
+machinery (`gettext_lazy` / `{% trans %}` / `{% blocktrans %}`).
+
+To activate translations in your project, make sure `LocaleMiddleware`
+is in your `MIDDLEWARE` (between `SessionMiddleware` and
+`CommonMiddleware`), `USE_I18N = True`, and your `LANGUAGES` list
+includes `pl`:
+
+```python
+MIDDLEWARE = [
+    "django.contrib.sessions.middleware.SessionMiddleware",
+    "django.middleware.locale.LocaleMiddleware",  # ← add this
+    "django.middleware.common.CommonMiddleware",
+    # ...
+]
+
+LANGUAGES = [("en", "English"), ("pl", "Polski")]
+USE_I18N = True
+```
+
+The browser's `Accept-Language` header then selects the active
+translation. The bundled `example/` project is wired this way.
+
+### Adding a new language
+
+```bash
+# from the package root:
+cd src/first_run_wizard
+django-admin makemessages -l <lang>     # e.g. de, fr, es, cs
+# edit locale/<lang>/LC_MESSAGES/django.po
+django-admin compilemessages
+```
+
+Requires the `gettext` toolchain (`brew install gettext` on macOS,
+`apt install gettext` on Debian/Ubuntu). PRs adding more translations
+are welcome.
+
 ## Development
 
 ```bash
