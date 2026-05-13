@@ -44,6 +44,9 @@ jobs:
           uv sync --all-extras
           uv pip install "django~=${DJANGO_VER}.0"
 
+      - name: Install gettext (for msgfmt)
+        run: sudo apt-get update && sudo apt-get install -y gettext
+
       - name: Compile library translations
         run: |
           find src/first_run_wizard -name '*.mo' -delete
@@ -86,6 +89,9 @@ jobs:
       - name: Install dependencies
         run: uv sync --all-extras
 
+      - name: Install gettext (for msgfmt)
+        run: sudo apt-get update && sudo apt-get install -y gettext
+
       - name: Compile translations (library + example)
         run: |
           find src/first_run_wizard example -name '*.mo' -delete
@@ -115,6 +121,9 @@ jobs:
 
       - name: Install dependencies
         run: uv sync --all-extras
+
+      - name: Install gettext (for msgfmt / msguniq / xgettext)
+        run: sudo apt-get update && sudo apt-get install -y gettext
 
       - name: Re-extract library catalog
         working-directory: src/first_run_wizard

@@ -4,24 +4,23 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('notes', '0001_initial'),
+        ("notes", "0001_initial"),
     ]
 
     operations = [
         migrations.AlterModelOptions(
-            name='note',
-            options={'verbose_name': 'note', 'verbose_name_plural': 'notes'},
+            name="note",
+            options={"verbose_name": "note", "verbose_name_plural": "notes"},
         ),
         migrations.AlterField(
-            model_name='note',
-            name='body',
-            field=models.TextField(blank=True, verbose_name='body'),
+            model_name="note",
+            name="body",
+            field=models.TextField(blank=True, verbose_name="body"),
         ),
         migrations.AlterField(
-            model_name='note',
-            name='title',
-            field=models.CharField(max_length=200, verbose_name='title'),
+            model_name="note",
+            name="title",
+            field=models.CharField(max_length=200, verbose_name="title"),
         ),
     ]
