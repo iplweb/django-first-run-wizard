@@ -1,0 +1,59 @@
+{% load i18n %}<!DOCTYPE html>
+<html lang="{{ LANGUAGE_CODE|default:'en' }}">
+<head>
+    <meta charset="utf-8">
+    <title>{% trans "Welcome" %}</title>
+</head>
+<body>
+    <h1>{% trans "Welcome" %}</h1>
+
+    {% if note_exists and user.is_authenticated %}
+        <p>
+            {% blocktrans trimmed %}
+                The Note was created in the site-specific <code>first_note</code> wizard step
+                — that's why you can see this page.
+            {% endblocktrans %}
+        </p>
+        <p>
+            {% blocktrans trimmed with username=user.get_username %}
+                You are logged in as <strong>{{ username }}</strong>, the admin user
+                created by the built-in <code>admin_user</code> step. The wizard signs
+                you in automatically on form submit.
+            {% endblocktrans %}
+        </p>
+    {% elif note_exists %}
+        <p>
+            {% blocktrans trimmed %}
+                The admin user and the first Note have been created, but you are not
+                currently logged in.
+            {% endblocktrans %}
+        </p>
+        <p>
+            {% blocktrans trimmed %}
+                Open <a href="/admin/">/admin/</a> and sign in to manage the site.
+            {% endblocktrans %}
+        </p>
+    {% elif user_exists %}
+        <p>
+            {% blocktrans trimmed %}
+                The admin user has been created, but the first Note has <strong>not</strong>
+                been created yet — log in as the admin user via <a href="/admin/">/admin/</a>;
+                on the next request the wizard will redirect you to the <code>first_note</code>
+                step.
+            {% endblocktrans %}
+        </p>
+    {% else %}
+        <p>
+            {% blocktrans trimmed %}
+                Setup is not complete. Visit <a href="/setup/">/setup/</a> to start the wizard.
+            {% endblocktrans %}
+        </p>
+    {% endif %}
+
+    <hr>
+    <p>
+        <a href="/admin/">{% trans "Open admin" %}</a> &middot;
+        <a href="/setup/">{% trans "Wizard status" %}</a>
+    </p>
+</body>
+</html>

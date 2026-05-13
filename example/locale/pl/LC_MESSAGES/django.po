@@ -1,0 +1,104 @@
+# Polish translation for the django-first-run-wizard example project.
+# Copyright (C) 2026 Michał Pasternak
+# This file is distributed under the same license as the
+# django-first-run-wizard package.
+# Michał Pasternak <michal.dtz@gmail.com>, 2026.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: django-first-run-wizard-example 0.1.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-05-13 14:08-0500\n"
+"PO-Revision-Date: 2026-05-13 21:10+0200\n"
+"Last-Translator: Michał Pasternak <michal.dtz@gmail.com>\n"
+"Language-Team: Polish <michal.dtz@gmail.com>\n"
+"Language: pl\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=4; plural=(n==1 ? 0 : (n%10>=2 && n%10<=4) && "
+"(n%100<12 || n%100>14) ? 1 : n!=1 && (n%10>=0 && n%10<=1) || (n%10>=5 && "
+"n%10<=9) || (n%100>=12 && n%100<=14) ? 2 : 3);\n"
+
+msgid "Notes"
+msgstr "Notatki"
+
+msgid "title"
+msgstr "tytuł"
+
+msgid "body"
+msgstr "treść"
+
+msgid "note"
+msgstr "notatka"
+
+msgid "notes"
+msgstr "notatki"
+
+msgid "Create your first note"
+msgstr "Utwórz pierwszą notatkę"
+
+msgid ""
+"This is a project-specific setup step. Create the first note to finish setup."
+msgstr ""
+"To jest krok konfiguracji specyficzny dla projektu. Utwórz pierwszą "
+"notatkę, aby zakończyć konfigurację."
+
+msgid "Save first note"
+msgstr "Zapisz pierwszą notatkę"
+
+msgid "Welcome"
+msgstr "Witaj"
+
+msgid ""
+"The Note was created in the site-specific <code>first_note</code> wizard "
+"step — that's why you can see this page."
+msgstr ""
+"Notatka została utworzona w specyficznym dla projektu kroku "
+"<code>first_note</code> kreatora — dlatego widzisz tę stronę."
+
+#, python-format
+msgid ""
+"You are logged in as <strong>%(username)s</strong>, the admin user created "
+"by the built-in <code>admin_user</code> step. The wizard signs you in "
+"automatically on form submit."
+msgstr ""
+"Jesteś zalogowany jako <strong>%(username)s</strong> — to konto "
+"administratora utworzone przez wbudowany krok <code>admin_user</code>. "
+"Kreator loguje użytkownika automatycznie po zatwierdzeniu formularza."
+
+msgid ""
+"The admin user and the first Note have been created, but you are not "
+"currently logged in."
+msgstr ""
+"Konto administratora oraz pierwsza notatka zostały utworzone, ale "
+"obecnie nie jesteś zalogowany."
+
+msgid "Open <a href=\"/admin/\">/admin/</a> and sign in to manage the site."
+msgstr ""
+"Otwórz <a href=\"/admin/\">/admin/</a> i zaloguj się, aby zarządzać "
+"witryną."
+
+msgid ""
+"The admin user has been created, but the first Note has <strong>not</strong> "
+"been created yet — log in as the admin user via <a href=\"/admin/\">/admin/</"
+"a>; on the next request the wizard will redirect you to the "
+"<code>first_note</code> step."
+msgstr ""
+"Konto administratora zostało utworzone, ale pierwsza notatka <strong>nie</"
+"strong> została jeszcze utworzona — zaloguj się jako administrator przez "
+"<a href=\"/admin/\">/admin/</a>; przy następnym żądaniu kreator przekieruje "
+"Cię do kroku <code>first_note</code>."
+
+msgid ""
+"Setup is not complete. Visit <a href=\"/setup/\">/setup/</a> to start the "
+"wizard."
+msgstr ""
+"Konfiguracja nie została zakończona. Odwiedź <a href=\"/setup/\">/setup/</a>, "
+"aby uruchomić kreatora."
+
+msgid "Open admin"
+msgstr "Otwórz panel administracyjny"
+
+msgid "Wizard status"
+msgstr "Stan kreatora"

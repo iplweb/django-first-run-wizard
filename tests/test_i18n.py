@@ -22,7 +22,9 @@ def test_polish_translation_loads_for_form_labels():
 
 def test_polish_translation_loads_for_step_verbose_name():
     with override("pl"):
-        assert str(AdminUserCreationStep().verbose_name) == "Utwórz konto administratora"
+        assert (
+            str(AdminUserCreationStep().verbose_name) == "Utwórz konto administratora"
+        )
 
 
 def test_polish_translation_loads_for_template_strings():

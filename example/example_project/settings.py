@@ -39,10 +39,12 @@ DATABASES = {
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
+        "DIRS": [BASE_DIR / "templates"],
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [
                 "django.template.context_processors.request",
+                "django.template.context_processors.i18n",
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
             ],
@@ -60,3 +62,4 @@ LANGUAGES = [
     ("pl", "Polski"),
 ]
 USE_I18N = True
+LOCALE_PATHS = [BASE_DIR / "locale"]

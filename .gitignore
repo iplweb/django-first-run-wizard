@@ -53,3 +53,7 @@ service-account*.json
 ._*
 Thumbs.db
 desktop.ini
+
+# Dev-server tooling (run-site)
+.run-site-config
+.run-site/
