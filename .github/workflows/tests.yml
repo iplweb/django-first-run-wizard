@@ -27,10 +27,14 @@ jobs:
           - { python-version: "3.13", django-version: "6.0" }
           - { python-version: "3.14", django-version: "6.0" }
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       - name: Install uv
-        uses: astral-sh/setup-uv@d4b2f3b6ecc6e67c4457f6d3e41ec42d3d0fcb86  # v5
+        uses: astral-sh/setup-uv@08807647e7069bb48b6ef5acd8ec9567f424441b  # v8.1.0
+        with:
+          # uv.lock is gitignored (this is a library), so key the cache
+          # on pyproject.toml — the source of truth for our deps.
+          cache-dependency-glob: 'pyproject.toml'
 
       - name: Set up Python
         env:
@@ -58,10 +62,14 @@ jobs:
   lint:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       - name: Install uv
-        uses: astral-sh/setup-uv@d4b2f3b6ecc6e67c4457f6d3e41ec42d3d0fcb86  # v5
+        uses: astral-sh/setup-uv@08807647e7069bb48b6ef5acd8ec9567f424441b  # v8.1.0
+        with:
+          # uv.lock is gitignored (this is a library), so key the cache
+          # on pyproject.toml — the source of truth for our deps.
+          cache-dependency-glob: 'pyproject.toml'
 
       - name: Set up Python
         run: uv python install 3.13
@@ -78,10 +86,14 @@ jobs:
   example-check:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       - name: Install uv
-        uses: astral-sh/setup-uv@d4b2f3b6ecc6e67c4457f6d3e41ec42d3d0fcb86  # v5
+        uses: astral-sh/setup-uv@08807647e7069bb48b6ef5acd8ec9567f424441b  # v8.1.0
+        with:
+          # uv.lock is gitignored (this is a library), so key the cache
+          # on pyproject.toml — the source of truth for our deps.
+          cache-dependency-glob: 'pyproject.toml'
 
       - name: Set up Python
         run: uv python install 3.13
@@ -111,10 +123,14 @@ jobs:
     # leaking into the other catalog).
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       - name: Install uv
-        uses: astral-sh/setup-uv@d4b2f3b6ecc6e67c4457f6d3e41ec42d3d0fcb86  # v5
+        uses: astral-sh/setup-uv@08807647e7069bb48b6ef5acd8ec9567f424441b  # v8.1.0
+        with:
+          # uv.lock is gitignored (this is a library), so key the cache
+          # on pyproject.toml — the source of truth for our deps.
+          cache-dependency-glob: 'pyproject.toml'
 
       - name: Set up Python
         run: uv python install 3.13
