@@ -44,6 +44,11 @@ jobs:
           uv sync --all-extras
           uv pip install "django~=${DJANGO_VER}.0"
 
+      - name: Compile library translations
+        run: |
+          find src/first_run_wizard -name '*.mo' -delete
+          cd src/first_run_wizard && uv run django-admin compilemessages
+
       - name: Run tests
         run: uv run pytest -v
 
@@ -80,6 +85,12 @@ jobs:
 
       - name: Install dependencies
         run: uv sync --all-extras
+
+      - name: Compile translations (library + example)
+        run: |
+          find src/first_run_wizard example -name '*.mo' -delete
+          (cd src/first_run_wizard && uv run django-admin compilemessages)
+          (cd example && uv run python manage.py compilemessages)
 
       - name: Django check on example project
         working-directory: example
