@@ -4,5 +4,3 @@ from first_run_wizard.registry import registry
 from first_run_wizard.steps import SetupStep
 
 __all__ = ["SetupStep", "registry"]
-
-default_app_config = "first_run_wizard.apps.FirstRunWizardConfig"

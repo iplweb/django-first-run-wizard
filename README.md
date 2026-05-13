@@ -1,5 +1,10 @@
 # django-first-run-wizard
 
+[![Tests](https://github.com/iplweb/django-first-run-wizard/actions/workflows/tests.yml/badge.svg)](https://github.com/iplweb/django-first-run-wizard/actions/workflows/tests.yml)
+[![Python Version](https://img.shields.io/badge/python-3.10%20%7C%203.11%20%7C%203.12%20%7C%203.13%20%7C%203.14-blue)](https://github.com/iplweb/django-first-run-wizard)
+[![Django Version](https://img.shields.io/badge/django-5.2%20LTS%20%7C%206.0-0C4B33)](https://github.com/iplweb/django-first-run-wizard)
+[![License: MIT](https://img.shields.io/github/license/iplweb/django-first-run-wizard)](LICENSE)
+
 Pluggable first-run setup wizard for Django. On a fresh install, redirects
 every request to a configurable sequence of setup steps. Ships with one
 built-in step (create the first superuser); your project plugs in whatever
@@ -21,7 +26,24 @@ This package is the missing piece: **a plugin-based registry of setup
 steps with middleware that redirects to the next incomplete one**, so a
 fresh install walks an admin through configuration in the browser.
 
+## Features
+
+- **Fresh-install detection** — middleware redirects every request to the next incomplete setup step until the wizard finishes.
+- **Plugin registry** — each step is a `SetupStep` subclass registered in `AppConfig.ready()`; ordered by an `order` integer.
+- **Built-in admin user step** — creates the first superuser via a `UserCreationForm` adapted to your `AUTH_USER_MODEL`, then logs them in.
+- **Replaceable steps** — `registry.unregister("admin_user")` then register your own form/template if the built-in doesn't fit.
+- **Access control** — `requires_authentication` / `requires_superuser` flags per step; custom logic via `is_accessible(request)`.
+- **Configurable skip rules** — `FIRST_RUN_WIZARD_SKIP_PREFIXES` / `FIRST_RUN_WIZARD_SKIP_SUBSTRINGS` to keep `/metrics/`, `/healthz/`, etc. out of the redirect loop.
+
 ## Install
+
+### Using uv (recommended)
+
+```bash
+uv add django-first-run-wizard
+```
+
+### Using pip
 
 ```bash
 pip install django-first-run-wizard
@@ -153,10 +175,16 @@ registry.register(MyCustomAdminStep())
 The wizard's own URLs (`first_run_wizard:status` and below) are
 auto-skipped to avoid redirect loops.
 
-## Requirements
+## Supported versions
 
-- Python ≥ 3.10
-- Django ≥ 5.2 (5.2 LTS and 6.0 are both in CI)
+### Django × Python
+
+| Django  | 3.10 | 3.11 | 3.12 | 3.13 | 3.14 | Status                                 |
+|---------|------|------|------|------|------|----------------------------------------|
+| 5.2 LTS | ✓    | ✓    | ✓    | ✓    | ✓    | Active LTS (extended support Apr 2028) |
+| 6.0     | —    | —    | ✓    | ✓    | ✓    | Mainstream Aug 2026, extended Apr 2027 |
+
+Every ✓ above is covered by the CI matrix in `.github/workflows/tests.yml`.
 
 ## Development
 
