@@ -1,0 +1,30 @@
+{% extends "first_run_wizard/base.html" %}
+{% load i18n %}
+
+{% block title %}{% trans "Setup status" %}{% endblock %}
+
+{% block content %}
+    <h1>{% trans "Setup status" %}</h1>
+
+    {% if all_done %}
+        <p>{% trans "All setup steps have been completed." %}</p>
+    {% else %}
+        <p>{% trans "The following setup steps still need attention:" %}</p>
+    {% endif %}
+
+    <ul>
+        {% for item in steps %}
+            <li>
+                {% if item.is_complete %}
+                    &#10003;
+                {% else %}
+                    &#9744;
+                {% endif %}
+                <strong>{{ item.step.verbose_name }}</strong>
+                {% if not item.is_complete %}
+                    &mdash; <a href="{{ item.step.get_url }}">{% trans "open" %}</a>
+                {% endif %}
+            </li>
+        {% endfor %}
+    </ul>
+{% endblock %}

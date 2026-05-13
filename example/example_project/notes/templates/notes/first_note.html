@@ -1,0 +1,11 @@
+{% extends "first_run_wizard/base.html" %}
+
+{% block content %}
+<h1>{{ title }}</h1>
+<p>This is a project-specific setup step. Create the first note to finish setup.</p>
+<form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Save first note</button>
+</form>
+{% endblock %}

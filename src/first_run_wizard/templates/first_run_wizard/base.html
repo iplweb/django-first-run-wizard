@@ -1,0 +1,33 @@
+{% load i18n %}<!DOCTYPE html>
+<html lang="{{ LANGUAGE_CODE|default:'en' }}">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% block title %}{% trans "First-Run Wizard" %}{% endblock %}</title>
+    {% block extra_head %}{% endblock %}
+    <style>
+        body { font-family: -apple-system, system-ui, sans-serif; max-width: 640px; margin: 2em auto; padding: 0 1em; color: #222; }
+        h1 { font-size: 1.6em; margin-bottom: 0.3em; }
+        h2 { font-size: 1.2em; color: #555; font-weight: 400; margin-top: 0; }
+        form p { margin: 0.8em 0; }
+        label { display: block; font-weight: 600; margin-bottom: 0.25em; }
+        input[type=text], input[type=email], input[type=password] { width: 100%; padding: 0.5em; border: 1px solid #bbb; border-radius: 3px; box-sizing: border-box; }
+        .helptext { color: #777; font-size: 0.85em; display: block; margin-top: 0.2em; }
+        .errorlist { color: #c33; list-style: none; padding-left: 0; margin: 0.3em 0; }
+        button { background: #2864d8; color: #fff; border: 0; padding: 0.6em 1.4em; border-radius: 3px; font-size: 1em; cursor: pointer; }
+        button:hover { background: #1f4fa8; }
+        .messages li { list-style: none; padding: 0.5em 0.8em; border-radius: 3px; margin: 0.5em 0; }
+        .messages li.success { background: #d4edda; color: #155724; }
+        .messages li.info { background: #d1ecf1; color: #0c5460; }
+        .messages li.error { background: #f8d7da; color: #721c24; }
+    </style>
+</head>
+<body>
+    {% if messages %}
+        <ul class="messages">
+            {% for m in messages %}<li class="{{ m.tags }}">{{ m }}</li>{% endfor %}
+        </ul>
+    {% endif %}
+    {% block content %}{% endblock %}
+</body>
+</html>
