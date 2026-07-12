@@ -59,6 +59,50 @@ jobs:
       - name: Run tests
         run: uv run pytest -v
 
+  # The admin-creation lock (select_for_update) can only be exercised on a
+  # backend that supports SELECT ... FOR UPDATE — SQLite silently no-ops it.
+  # This leg runs the concurrency guard against a real PostgreSQL.
+  test-postgres:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: first_run_wizard
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@08807647e7069bb48b6ef5acd8ec9567f424441b  # v8.1.0
+        with:
+          cache-dependency-glob: 'pyproject.toml'
+
+      - name: Set up Python
+        run: uv python install 3.13
+
+      - name: Install dependencies
+        run: |
+          uv sync --all-extras
+          uv pip install "psycopg[binary]"
+
+      - name: Run concurrency test against PostgreSQL
+        env:
+          POSTGRES_HOST: localhost
+          POSTGRES_PORT: "5432"
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: first_run_wizard
+        run: uv run pytest -v tests/test_concurrency.py --ds=tests.settings_postgres
+
   lint:
     runs-on: ubuntu-latest
     steps:
