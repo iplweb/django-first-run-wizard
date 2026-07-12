@@ -222,6 +222,54 @@ def test_middleware_stays_active_when_db_not_ready(monkeypatch):
     assert instance._setup_complete is False
 
 
+def test_active_wizard_on_full_db_does_not_redirect(monkeypatch):
+    """The 'wizard active' fallback must NOT redirect a working install.
+
+    If the construction read errors (→ wizard stays active) but the database
+    is fully set up, the per-request check must find every step complete and
+    pass the request through — never bounce a live site into /setup/. It also
+    self-heals: completed_at gets stamped so the next worker fast-paths.
+    """
+    from django.contrib.auth import get_user_model
+    from django.db import OperationalError
+    from django.test import Client
+
+    from first_run_wizard import middleware as mw
+    from first_run_wizard.models import FirstRunWizardState
+
+    # Full, working install: admin exists (the only builtin step is complete),
+    # but completed_at is unset, so there is no fast-path shortcut.
+    get_user_model().objects.create_superuser(
+        username="admin", email="a@b.example", password="VeryStrong123!"
+    )
+    state = FirstRunWizardState.load()
+    state.completed_at = None
+    state.save()
+
+    # Make ONLY the construction read (.only(...)) fail; the steps' exists()
+    # checks and mark_completed() still work (delegated to the real manager).
+    class _OnlyBoom:
+        def __init__(self, real):
+            self._real = real
+
+        def only(self, *args, **kwargs):
+            raise OperationalError("simulated transient hiccup at construction")
+
+        def __getattr__(self, name):
+            return getattr(self._real, name)
+
+    monkeypatch.setattr(
+        mw.FirstRunWizardState, "objects", _OnlyBoom(FirstRunWizardState.objects)
+    )
+
+    response = Client().get("/")
+    assert response.status_code == 200, (
+        f"a full DB was redirected: {response.get('Location')}"
+    )
+    assert response.content == b"home"
+    assert FirstRunWizardState.load().completed_at is not None
+
+
 def test_inspect_is_non_blocking_when_a_step_raises():
     """If a step's is_complete() raises (DB not ready), inspect() reports
     nothing complete and no next step — never blocks the request."""
