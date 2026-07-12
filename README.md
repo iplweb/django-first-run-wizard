@@ -78,9 +78,41 @@ urlpatterns = [
 ]
 ```
 
+Run migrations (the wizard ships a small single-row state table):
+
+```bash
+python manage.py migrate first_run_wizard
+```
+
 That's enough to get the **built-in admin step** working: visit any URL on
 a fresh install → redirected to `/setup/step/admin_user/` → fill in the
 form → user is created, logged in, redirected to `/`.
+
+## Completion, performance, and re-opening
+
+Setup is tracked in a single-row table (`FirstRunWizardState`, `pk=1`):
+
+- **Zero cost when done.** Once every step is complete the middleware records
+  `completed_at` and, on each subsequent worker start, raises
+  `MiddlewareNotUsed` — Django drops it from the chain, so a finished install
+  runs *no* wizard queries per request. The `/setup/` views return 404.
+- **Tied to the database on purpose.** The "done" flag lives in the DB, not a
+  cache: resetting/reloading the database re-opens the wizard, as it should.
+  A cache surviving a DB reset would wrongly report setup as done.
+- **Deleting data does not re-open it.** Removing the admin or your
+  project's objects will not re-show `/setup/` once `completed_at` is set.
+- **Concurrency-safe admin creation.** The first-superuser step creates the
+  user under a row lock (`select_for_update`) and re-checks after acquiring
+  it, so two simultaneous submissions resolve to exactly one superuser; the
+  loser gets a form error, not an HTTP 500.
+
+To deliberately re-open the wizard (e.g. to redo a later step), clear the
+flag and **restart your workers** (a running worker has already dropped the
+middleware):
+
+```bash
+python manage.py reopen_first_run_wizard
+```
 
 ## Adding your own steps
 

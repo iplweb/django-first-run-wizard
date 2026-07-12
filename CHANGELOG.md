@@ -7,6 +7,39 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.2.0] - 2026-07-12
+
+### Added
+- `FirstRunWizardState` — a single-row (`pk=1`) state table shipped by a new
+  migration. It records `admin_created_at` and `completed_at`.
+- `reopen_first_run_wizard` management command to clear `completed_at` and
+  re-open the wizard (takes effect after a worker restart).
+
+### Changed
+- **A finished install now costs nothing per request.** Once every step is
+  complete, `completed_at` is recorded and the middleware raises
+  `MiddlewareNotUsed` at construction, so Django drops it from the chain —
+  no more per-request `is_complete()` queries. Previously the middleware ran
+  an `EXISTS` query for each step on every request, forever.
+- `SetupRegistry.inspect()` replaces the internals of
+  `get_next_incomplete_step()` (kept as a thin wrapper): one pass now returns
+  both the next accessible step and whether all steps are complete.
+- After completion, the `/setup/` views return **404** instead of redirecting
+  to `/`. Deleting the admin/your objects no longer re-opens the wizard.
+
+### Fixed
+- **Concurrent admin creation can no longer create two superusers.** The
+  first-superuser step now creates the user inside `transaction.atomic()`
+  under `select_for_update()` on the state row and re-checks after acquiring
+  the lock. Two simultaneous POSTs resolve to exactly one winner; the loser
+  receives a form error instead of an HTTP 500. (The form's `clean()` check
+  remains, but only as a fast, non-authoritative message.)
+
+### Upgrading
+- Run `python manage.py migrate first_run_wizard` after upgrading. Existing
+  installs where setup is already finished are detected on first request (a
+  one-time repair pass) and `completed_at` is backfilled automatically.
+
 ## [0.1.1] - 2026-05-13
 
 ### Fixed

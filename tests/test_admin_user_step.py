@@ -121,9 +121,11 @@ def test_admin_step_rejects_when_user_already_exists():
     client = Client()
     url = reverse("first_run_wizard:step", kwargs={"name": "admin_user"})
     response = client.get(url)
-    # Step is complete → redirect to '/' rather than render the form.
-    assert response.status_code == 302
-    assert response.url == "/"
+    # A user exists → admin_user is the only builtin step and it's complete →
+    # the whole wizard is complete. The middleware's repair path stamps
+    # completed_at on construction, so /setup/ is closed for good: 404, not a
+    # redirect. (A second admin can never be created here again.)
+    assert response.status_code == 404
 
 
 @pytest.mark.django_db

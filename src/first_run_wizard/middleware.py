@@ -1,11 +1,22 @@
-"""Middleware that redirects to the next incomplete setup step."""
+"""Middleware that redirects to the next incomplete setup step.
+
+A finished install pays nothing: once ``completed_at`` is set the middleware
+raises ``MiddlewareNotUsed`` at construction and Django drops it from the
+chain for the life of the worker — zero wizard queries per request.
+
+During setup it walks the registry once per request (``registry.inspect``)
+to find the next step and to notice the moment the last step is done, at
+which point it stamps ``completed_at`` so the *next* worker self-disables.
+"""
 
 from __future__ import annotations
 
 from django.conf import settings
+from django.core.exceptions import MiddlewareNotUsed
 from django.shortcuts import redirect
 from django.urls import reverse
 
+from first_run_wizard.models import FirstRunWizardState
 from first_run_wizard.registry import registry
 
 DEFAULT_SKIP_PREFIXES: tuple[str, ...] = (
@@ -41,8 +52,51 @@ class FirstRunWizardMiddleware:
 
     def __init__(self, get_response):
         self.get_response = get_response
+        # Once a request proves setup is finished, this instance stops
+        # touching the registry for the rest of its life.
+        self._setup_complete = False
+        if self._install_is_finished():
+            # Finished install → don't run at all. Django removes us from
+            # the middleware chain; per-request cost drops to zero.
+            raise MiddlewareNotUsed
+
+    def _install_is_finished(self) -> bool:
+        """True only if setup is provably complete; False on any doubt.
+
+        Reads the ``completed_at`` flag. If it is unset but every step is
+        already satisfied (an install upgraded from a pre-state package
+        version), backfill the flag and report finished. Any DB-not-ready
+        condition — missing table before migrations, connection down —
+        returns False so the wizard stays active rather than crashing
+        worker/`runserver` startup.
+        """
+        try:
+            state = (
+                FirstRunWizardState.objects.only("completed_at").filter(pk=1).first()
+            )
+        except Exception:
+            # Table missing (migrations not applied) or DB down → not
+            # finished; keep the wizard active. Safe default.
+            return False
+
+        if state is None:
+            # Singleton row absent (pre-migration / hand-deleted) — can't
+            # fast-path; let the per-request logic run (it self-heals).
+            return False
+
+        if state.completed_at:
+            return True
+
+        # Repair path: flag unset but maybe every step is already done.
+        if registry.inspect().all_complete:
+            FirstRunWizardState.mark_completed()
+            return True
+        return False
 
     def __call__(self, request):
+        if self._setup_complete:
+            return self.get_response(request)
+
         if not self._should_skip(request):
             redirect_response = self._maybe_redirect(request)
             if redirect_response is not None:
@@ -76,7 +130,14 @@ class FirstRunWizardMiddleware:
         return False
 
     def _maybe_redirect(self, request):
-        next_step = registry.get_next_incomplete_step(request)
+        inspection = registry.inspect(request)
+        if inspection.all_complete:
+            # Last step just finished. Record it so the next worker
+            # self-disables, and short-circuit this instance from now on.
+            FirstRunWizardState.mark_completed()
+            self._setup_complete = True
+            return None
+        next_step = inspection.next_step
         if next_step is None:
             return None
         target = next_step.get_url()
