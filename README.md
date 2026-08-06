@@ -2,7 +2,7 @@
 
 [![Tests](https://github.com/iplweb/django-first-run-wizard/actions/workflows/tests.yml/badge.svg)](https://github.com/iplweb/django-first-run-wizard/actions/workflows/tests.yml)
 [![Python Version](https://img.shields.io/badge/python-3.10%20%7C%203.11%20%7C%203.12%20%7C%203.13%20%7C%203.14-blue)](https://github.com/iplweb/django-first-run-wizard)
-[![Django Version](https://img.shields.io/badge/django-5.2%20LTS%20%7C%206.0-0C4B33)](https://github.com/iplweb/django-first-run-wizard)
+[![Django Version](https://img.shields.io/badge/django-5.2%20LTS%20%7C%206.0%20%7C%206.1-0C4B33)](https://github.com/iplweb/django-first-run-wizard)
 [![License: MIT](https://img.shields.io/github/license/iplweb/django-first-run-wizard)](LICENSE)
 
 Pluggable first-run setup wizard for Django. On a fresh install, redirects
@@ -240,6 +240,7 @@ typically discover the wizard via the redirect from `/` instead.
 |---------|------|------|------|------|------|----------------------------------------|
 | 5.2 LTS | ✓    | ✓    | ✓    | ✓    | ✓    | Active LTS (extended support Apr 2028) |
 | 6.0     | —    | —    | ✓    | ✓    | ✓    | Mainstream Aug 2026, extended Apr 2027 |
+| 6.1     | —    | —    | ✓    | ✓    | ✓    | Mainstream Apr 2027, extended Dec 2027 |
 
 Every ✓ above is covered by the CI matrix in `.github/workflows/tests.yml`.
 
