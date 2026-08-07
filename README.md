@@ -126,12 +126,12 @@ from myproject.tenants.models import Tenant
 
 
 class CreateTenantStep(SetupStep):
-    name = "create_tenant"           # unique slug; URL = /setup/step/create_tenant/
+    name = "create_tenant"  # unique slug; URL = /setup/step/create_tenant/
     verbose_name = "Configure your organization"
-    order = 100                       # runs after admin_user (order=0)
+    order = 100  # runs after admin_user (order=0)
     form_class = TenantSetupForm
     template_name = "onboarding/create_tenant.html"
-    requires_superuser = True         # only the just-created admin can run it
+    requires_superuser = True  # only the just-created admin can run it
 
     def is_complete(self):
         return Tenant.objects.exists()
@@ -148,6 +148,7 @@ class OnboardingConfig(AppConfig):
     def ready(self):
         from first_run_wizard import registry
         from myproject.onboarding.steps import CreateTenantStep
+
         registry.register(CreateTenantStep())
 ```
 
