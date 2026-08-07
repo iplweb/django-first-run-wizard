@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "django-first-run-wizard"
-version = "0.2.0"
+version = "0.2.1"
 description = "Pluggable first-run setup wizard for Django: gets a fresh install through admin creation and any project-specific configuration steps."
 readme = "README.md"
 requires-python = ">=3.10"

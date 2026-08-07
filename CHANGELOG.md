@@ -7,9 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.2.1] - 2026-08-07
+
 ### Added
 - Support for Django 6.1 (Python 3.12+). The CI matrix now runs 6.1 on
-  Python 3.12, 3.13 and 3.14, alongside the existing 5.2 LTS and 6.0 legs.
+  Python 3.12, 3.13 and 3.14, alongside the existing 5.2 LTS and 6.0 legs,
+  and the package advertises the `Framework :: Django :: 6.1` classifier.
 
 ## [0.2.0] - 2026-07-12
 
@@ -121,6 +124,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   contamination between library and example.
 - Third-party GitHub Action `astral-sh/setup-uv` pinned to commit SHA.
 
-[Unreleased]: https://github.com/iplweb/django-first-run-wizard/compare/v0.1.1...HEAD
+[Unreleased]: https://github.com/iplweb/django-first-run-wizard/compare/v0.2.1...HEAD
+[0.2.1]: https://github.com/iplweb/django-first-run-wizard/compare/v0.2.0...v0.2.1
+[0.2.0]: https://github.com/iplweb/django-first-run-wizard/compare/v0.1.1...v0.2.0
 [0.1.1]: https://github.com/iplweb/django-first-run-wizard/compare/v0.1.0...v0.1.1
 [0.1.0]: https://github.com/iplweb/django-first-run-wizard/releases/tag/v0.1.0
