@@ -2,7 +2,7 @@
 
 [![Tests](https://github.com/iplweb/django-first-run-wizard/actions/workflows/tests.yml/badge.svg)](https://github.com/iplweb/django-first-run-wizard/actions/workflows/tests.yml)
 [![Python Version](https://img.shields.io/badge/python-3.10%20%7C%203.11%20%7C%203.12%20%7C%203.13%20%7C%203.14-blue)](https://github.com/iplweb/django-first-run-wizard)
-[![Django Version](https://img.shields.io/badge/django-5.2%20LTS%20%7C%206.0-0C4B33)](https://github.com/iplweb/django-first-run-wizard)
+[![Django Version](https://img.shields.io/badge/django-5.2%20LTS%20%7C%206.0%20%7C%206.1-0C4B33)](https://github.com/iplweb/django-first-run-wizard)
 [![License: MIT](https://img.shields.io/github/license/iplweb/django-first-run-wizard)](LICENSE)
 
 Pluggable first-run setup wizard for Django. On a fresh install, redirects
@@ -126,12 +126,12 @@ from myproject.tenants.models import Tenant
 
 
 class CreateTenantStep(SetupStep):
-    name = "create_tenant"           # unique slug; URL = /setup/step/create_tenant/
+    name = "create_tenant"  # unique slug; URL = /setup/step/create_tenant/
     verbose_name = "Configure your organization"
-    order = 100                       # runs after admin_user (order=0)
+    order = 100  # runs after admin_user (order=0)
     form_class = TenantSetupForm
     template_name = "onboarding/create_tenant.html"
-    requires_superuser = True         # only the just-created admin can run it
+    requires_superuser = True  # only the just-created admin can run it
 
     def is_complete(self):
         return Tenant.objects.exists()
@@ -148,6 +148,7 @@ class OnboardingConfig(AppConfig):
     def ready(self):
         from first_run_wizard import registry
         from myproject.onboarding.steps import CreateTenantStep
+
         registry.register(CreateTenantStep())
 ```
 
@@ -240,6 +241,7 @@ typically discover the wizard via the redirect from `/` instead.
 |---------|------|------|------|------|------|----------------------------------------|
 | 5.2 LTS | ✓    | ✓    | ✓    | ✓    | ✓    | Active LTS (extended support Apr 2028) |
 | 6.0     | —    | —    | ✓    | ✓    | ✓    | Mainstream Aug 2026, extended Apr 2027 |
+| 6.1     | —    | —    | ✓    | ✓    | ✓    | Mainstream Apr 2027, extended Dec 2027 |
 
 Every ✓ above is covered by the CI matrix in `.github/workflows/tests.yml`.
 

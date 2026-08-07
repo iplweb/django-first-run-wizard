@@ -26,6 +26,10 @@ jobs:
           - { python-version: "3.12", django-version: "6.0" }
           - { python-version: "3.13", django-version: "6.0" }
           - { python-version: "3.14", django-version: "6.0" }
+          # Django 6.1
+          - { python-version: "3.12", django-version: "6.1" }
+          - { python-version: "3.13", django-version: "6.1" }
+          - { python-version: "3.14", django-version: "6.1" }
     steps:
       - uses: actions/checkout@v6
 
@@ -54,10 +58,10 @@ jobs:
       - name: Compile library translations
         run: |
           find src/first_run_wizard -name '*.mo' -delete
-          cd src/first_run_wizard && uv run django-admin compilemessages
+          cd src/first_run_wizard && uv run --no-sync django-admin compilemessages
 
       - name: Run tests
-        run: uv run pytest -v
+        run: uv run --no-sync pytest -v
 
   # The admin-creation lock (select_for_update) can only be exercised on a
   # backend that supports SELECT ... FOR UPDATE — SQLite silently no-ops it.

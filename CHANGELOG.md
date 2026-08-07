@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- Support for Django 6.1 (Python 3.12+). The CI matrix now runs 6.1 on
+  Python 3.12, 3.13 and 3.14, alongside the existing 5.2 LTS and 6.0 legs.
+
 ## [0.2.0] - 2026-07-12
 
 ### Added
