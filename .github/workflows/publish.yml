@@ -1,0 +1,37 @@
+name: Publish to PyPI
+
+# PyPI Trusted Publishing (OIDC, bez tokenu w sekretach). Wydanie:
+# podbij wersję + CHANGELOG, zmerguj, potem
+#   git tag -a vX.Y.Z -m X.Y.Z && git push origin vX.Y.Z
+#   gh release create vX.Y.Z --notes-from-tag
+# Opublikowanie release'u uruchamia ten workflow.
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    environment: pypi
+    permissions:
+      id-token: write
+      contents: read
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: astral-sh/setup-uv@08807647e7069bb48b6ef5acd8ec9567f424441b  # v8.1.0
+
+      - name: Install gettext
+        run: sudo apt-get update && sudo apt-get install -y gettext
+
+      - name: Build
+        run: |
+          uv sync --all-extras
+          find src/first_run_wizard -name '*.mo' -delete
+          (cd src/first_run_wizard && uv run --no-sync django-admin compilemessages)
+          rm -rf dist
+          uv build
+
+      - uses: pypa/gh-action-pypi-publish@release/v1
