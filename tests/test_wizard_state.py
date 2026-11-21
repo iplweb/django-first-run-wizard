@@ -297,3 +297,25 @@ def test_inspect_is_non_blocking_when_a_step_raises():
     result = registry.inspect(request=None)
     assert result.all_complete is False
     assert result.next_step is None
+
+
+@pytest.mark.django_db
+def test_migration_stamps_existing_superuser():
+    from importlib import import_module
+
+    from django.apps import apps as global_apps
+    from django.contrib.auth import get_user_model
+
+    from first_run_wizard.models import FirstRunWizardState
+
+    mod = import_module("first_run_wizard.migrations.0002_stamp_existing_superuser")
+    mod.stamp_existing_superuser(global_apps, None)
+    assert FirstRunWizardState.load().admin_created_at is None
+
+    get_user_model().objects.create_superuser(
+        username="root",
+        email="r@example.com",
+        password="r",  # noqa: S106
+    )
+    mod.stamp_existing_superuser(global_apps, None)
+    assert FirstRunWizardState.load().admin_created_at is not None

@@ -100,7 +100,8 @@ Setup is tracked in a single-row table (`FirstRunWizardState`, `pk=1`):
   cache: resetting/reloading the database re-opens the wizard, as it should.
   A cache surviving a DB reset would wrongly report setup as done.
 - **Deleting data does not re-open it.** Removing the admin or your
-  project's objects will not re-show `/setup/` once `completed_at` is set.
+  project's objects will not re-show `/setup/` once `completed_at` is set;
+  the admin step alone is also closed for good by `admin_created_at`.
 - **Concurrency-safe admin creation.** The first-superuser step creates the
   user under a row lock (`select_for_update`) and re-checks after acquiring
   it, so two simultaneous submissions resolve to exactly one superuser; the
@@ -164,7 +165,15 @@ The middleware now redirects in this order:
 ### `AdminUserCreationStep`
 
 - `name = "admin_user"`, `order = 0`
-- `is_complete()` checks `get_user_model().objects.exists()`
+- `is_complete()` is `admin_account_set_up()`: true once
+  `FirstRunWizardState.admin_created_at` is stamped. The wizard stamps it when
+  it creates the admin; on a database that already holds a **superuser**
+  (`createsuperuser`, a restored dump) the first check — or migration `0002` —
+  stamps it. After that the step never re-opens, even if every superuser is
+  deleted.
+- Only superusers count: ordinary accounts (a technical/service account,
+  demo users from a data seeder) do not keep the wizard from asking for the
+  administrator. The form rejects a username such an account already uses.
 - Form: `AdminUserCreationForm` (subclass of `UserCreationForm` adapted to
   `settings.AUTH_USER_MODEL`)
 - On success: sets `is_staff=True, is_superuser=True, is_active=True`,
