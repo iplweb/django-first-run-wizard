@@ -17,8 +17,41 @@ __all__ = [
     "AdminUserCreationForm",
     "AdminUserCreationStep",
     "SetupAlreadyClaimed",
+    "admin_account_set_up",
     "create_first_admin",
 ]
+
+
+def _superuser_exists() -> bool:
+    return get_user_model()._default_manager.filter(is_superuser=True).exists()
+
+
+def admin_account_set_up() -> bool:
+    """Whether the first-admin step is done — for good.
+
+    True once ``FirstRunWizardState.admin_created_at`` is stamped. The wizard
+    stamps it when it creates the admin; on a database that already holds a
+    superuser (made by ``createsuperuser``, a restored dump, a deploy script)
+    the first call stamps it instead. Either way the step never re-activates
+    afterwards — not even if every superuser is later deleted, so an
+    unauthenticated visitor can never claim a running install.
+
+    Only superusers count. Ordinary accounts — a technical/service account,
+    demo users created by a data seeder — do not, so they no longer keep the
+    wizard from asking for the administrator on a fresh install.
+    """
+    stamped = FirstRunWizardState.objects.filter(
+        pk=1, admin_created_at__isnull=False
+    ).exists()
+    if stamped:
+        return True
+    if not _superuser_exists():
+        return False
+    FirstRunWizardState.objects.get_or_create(pk=1)
+    FirstRunWizardState.objects.filter(pk=1, admin_created_at__isnull=True).update(
+        admin_created_at=timezone.now()
+    )
+    return True
 
 
 def create_first_admin(*, username, email, password):
@@ -38,7 +71,12 @@ def create_first_admin(*, username, email, password):
     with transaction.atomic():
         FirstRunWizardState.objects.get_or_create(pk=1)
         state = FirstRunWizardState.objects.select_for_update().get(pk=1)
-        if state.admin_created_at or User.objects.exists():
+        if state.admin_created_at or _superuser_exists():
+            raise SetupAlreadyClaimed
+        # Non-superuser accounts may exist (see ``admin_account_set_up``);
+        # the form reports a taken username, this keeps a race from
+        # turning into an IntegrityError.
+        if User._default_manager.filter(**{User.USERNAME_FIELD: username}).exists():
             raise SetupAlreadyClaimed
         user = User.objects.create_superuser(
             username=username, email=email, password=password
@@ -49,7 +87,8 @@ def create_first_admin(*, username, email, password):
 
 
 class AdminUserCreationForm(forms.Form):
-    """Create the first superuser on a fresh install.
+    """Create the first superuser on a fresh install (one without a superuser;
+    ordinary accounts may already exist).
 
     Plain `forms.Form` (not `ModelForm`) so it stays decoupled from the
     project's `AUTH_USER_MODEL`. Uses `User.objects.create_superuser()`,
@@ -82,9 +121,22 @@ class AdminUserCreationForm(forms.Form):
 
     def clean(self):
         cleaned = super().clean()
-        if get_user_model().objects.exists():
+        if admin_account_set_up():
             raise ValidationError(
-                _("The setup wizard can only run on an empty user table.")
+                _("The administrator account has already been created.")
+            )
+        User = get_user_model()
+        username = cleaned.get("username")
+        if (
+            username
+            and User._default_manager.filter(**{User.USERNAME_FIELD: username}).exists()
+        ):
+            self.add_error(
+                "username",
+                ValidationError(
+                    _("A user with that username already exists."),
+                    code="unique",
+                ),
             )
 
         p1 = cleaned.get("password1")
@@ -135,7 +187,7 @@ class AdminUserCreationStep(SetupStep):
     requires_superuser = False
 
     def is_complete(self) -> bool:
-        return get_user_model().objects.exists()
+        return admin_account_set_up()
 
     def on_complete(self, form, request):
         user = form.save()

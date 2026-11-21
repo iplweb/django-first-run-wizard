@@ -7,6 +7,33 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.3.0] - 2026-11-21
+
+### Changed
+- **The first-admin step now looks at superusers, not at "any user".** It
+  is complete once `FirstRunWizardState.admin_created_at` is stamped; on a
+  database that already holds a superuser the stamp is written on the first
+  check (and by migration `0002` on upgrade). Ordinary accounts — a
+  technical/service account, demo users created by a data seeder — no longer
+  close the step, so a fresh install that ships such accounts still asks for
+  its administrator. Previously any row in the user table skipped the step,
+  and with no superuser at all nobody could log in to finish setup.
+- Once stamped, the admin step never re-opens, even if every superuser is
+  deleted (before, deleting all users re-opened it until `completed_at` was
+  set).
+- `AdminUserCreationForm` rejects a username an existing account already
+  uses ("A user with that username already exists."), and its "already set
+  up" error now reads "The administrator account has already been created."
+
+### Added
+- `admin_account_set_up()` in `first_run_wizard.builtin_steps.admin_user`.
+- Migration `0002_stamp_existing_superuser` (data only).
+
+### Upgrading
+- Run `python manage.py migrate first_run_wizard`. Installs with a superuser
+  are stamped; installs whose only accounts are non-superusers will show the
+  admin step again if setup was not finished yet.
+
 ## [0.2.1] - 2026-08-07
 
 ### Added

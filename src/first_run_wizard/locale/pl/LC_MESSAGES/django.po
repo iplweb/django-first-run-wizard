@@ -41,8 +41,11 @@ msgstr "Potwierdzenie hasła"
 msgid "Enter the same password as before, for verification."
 msgstr "Wprowadź to samo hasło ponownie w celu weryfikacji."
 
-msgid "The setup wizard can only run on an empty user table."
-msgstr "Kreator konfiguracji może działać wyłącznie na pustej tabeli użytkowników."
+msgid "The administrator account has already been created."
+msgstr "Konto administratora zostało już utworzone."
+
+msgid "A user with that username already exists."
+msgstr "Użytkownik o tej nazwie już istnieje."
 
 msgid "The two password fields didn't match."
 msgstr "Hasła w obu polach nie są identyczne."
